@@ -17,8 +17,8 @@ const ShowModel = ({ id, close, change }) => {
   const [newName, setNewName] = useState();
 
   const getolddata = async () => {
-    // const datas = await getDoc(doc(CityRef, id));
-    // setOldName(datas.data().CityNm);
+    const datas = await getDoc(doc(CityRef, id));
+    setOldName(datas.data().CityNm);
   };
 
   useEffect(() => {
@@ -57,12 +57,10 @@ const ShowModel = ({ id, close, change }) => {
                       type="text"
                       id="input"
                       class="form-inp p-3"
+                      value={oldName}
                       required
                       disabled
                     />
-                    <label for="input" class="form-lab">
-                      Old Transport Name
-                    </label>
                   </div>
                 </div>
                 <div class="d-lg-flex mt-lg-3">
@@ -72,6 +70,8 @@ const ShowModel = ({ id, close, change }) => {
                       id="input"
                       class="form-inp p-3"
                       required
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
                     />
                     <label for="input" class="form-lab">
                       New Short Name
@@ -121,6 +121,7 @@ export default function City() {
       }));
       setCityList(datas);
       setFilterData(datas);
+      console.log(datas);
     } catch (error) {
       console.log(error);
     }
@@ -144,25 +145,35 @@ export default function City() {
       await addDoc(CityRef, { CityNm: CityName }).then((doc) => {
         if (doc.id) {
           toast.success("SAVE");
+        } else {
+          toast.warning("Data Not Store !!!");
         }
       });
     }
     setCityName("");
     getCity();
   };
-
-  const CityDelete = async (id) => {
-    try {
-      deleteDoc(doc(CityRef, id.target.value)).then((doc) =>
-        toast.success("DELETE")
-      );
+  const CityDelete = (i) => {   
+if(!i){
+  return toast.warning('Refresh And Try agian')
+}
+      deleteDoc(doc(CityRef, i)).then((doc) => toast.success("DELETE"));
       getCity();
-    } catch (error) {
-      alert(error);
-    }
   };
   return (
     <div className="bg-card py-1">
+          <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"      
+      />
       {showModel && (
         <ShowModel id={id} close={() => setShowModel(false)} change={getCity} />
       )}
@@ -173,18 +184,34 @@ export default function City() {
         <div class="justify-content-between col-lg-8 mx-auto d-md-flex d-sm-inline-flex  ">
           <div class="d-flex py-2 mt-2  col-lg-4">
             <div class="input-wrapper">
-              <input type="text" id="input" class="form-inp" required />
+              <input
+                type="text"
+                id="input"
+                class="form-inp"
+                required
+                value={CityName}
+                onChange={(e) => setCityName(e.target.value)}
+              />
               <label for="input" class="form-lab">
                 Full name
               </label>
             </div>
-            <button class="btn btn-success py-2 px-3 text-white fw-bold text-uppercase rounded-0">
+            <button
+              onClick={CitySave}
+              class="btn btn-success py-2 px-3 text-white fw-bold text-uppercase rounded-0"
+            >
               Add
             </button>
           </div>
           <div class="d-flex mt-3 py-0">
             <div class="input-wrapper w-100">
-              <input type="text" id="input" class="form-inp p-3" required />
+              <input
+                type="text"
+                id="input"
+                class="form-inp p-3"
+                required
+                onChange={searchCity}
+              />
               <label for="input" class="form-lab">
                 Search
               </label>
@@ -210,30 +237,38 @@ export default function City() {
               </tr>
             </thead>
             <tbody class="table-group-divider">
-              <tr class="col-12">
-                <th scope="col" class="col-1">
-                  1
-                </th>
-                <td scope="col" class="col">
-                  Mark
-                </td>
-                <td scope="col" class="col">
-                  Otto
-                </td>
-                <td scope="col" class="col">
-                  <div class="d-flex">
-                    <button
-                      onClick={() => setShowModel(true)}
-                      class="btn btn-primary rounded-5  text-white"
-                    >
-                      <i class="bi bi-pencil-square"></i>
-                    </button>
-                    <button class="btn btn-danger rounded-5 mx-1 text-white">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
+              {filterData.map((item, index) => (
+                <tr class="col-12">
+                  <th scope="col" class="col-1">
+                    {index + 1}
+                  </th>
+                  <td scope="col" class="col">
+                    {item.CityNm}
+                  </td>
+                  <td scope="col" class="col">
+                    Otto
+                  </td>
+                  <td scope="col" class="col">
+                    <div class="d-flex">
+                      <button
+                        onClick={() => {
+                          setShowModel(true);
+                          setId(item.id);
+                        }}
+                        class="btn btn-primary rounded-5  text-white"
+                      >
+                        <i class="bi bi-pencil-square"></i>
+                      </button>
+                      <button              
+                        class="btn btn-danger rounded-5 mx-1 text-white"
+                        onClick={()=>CityDelete(item.id)}
+                      >
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

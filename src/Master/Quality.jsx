@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./master.css";
-import {collection} from "firebase/firestore";
+import {addDoc, collection,getDoc ,doc ,updateDoc,getDocs, deleteDoc} from "firebase/firestore";
 import { DB } from "../config/db.firebase";
 import { ToastContainer, toast } from "react-toastify";
 const QualityRef = collection(DB, "quality");
@@ -9,8 +9,8 @@ const ShowModel = ({ id, close, change }) => {
   const [newName, setNewName] = useState();
 
   const getolddata = async () => {
-    // const datas = await getDoc(doc(QualityRef, id));
-    // setOldName(datas.data().QualityNm);
+    const datas = await getDoc(doc(QualityRef, id));
+    setOldName(datas.data().QualityNm);
   };
 
   useEffect(() => {
@@ -23,10 +23,10 @@ const ShowModel = ({ id, close, change }) => {
     if (!newName) {
       toast.warning("Please enter name");
     } else {
-      // const datas = doc(QualityRef, id);
-      // await updateDoc(datas, { QualityNm: newName, date: currentDate }).then(
-      //   (doc) => toast.success("UPDATE")
-      // );
+      const datas = doc(QualityRef, id);
+      await updateDoc(datas, { QualityNm: newName }).then(
+        (doc) => toast.success("UPDATE")
+      );
       setNewName("");
       getolddata();
     }
@@ -111,13 +111,13 @@ export default function Quality() {
 
   const getQuality = async () => {
     try {
-      // const querySnapshot = await getDocs(QualityRef);
-      // const datas = querySnapshot.docs.map((doc) => ({
-      //   ...doc.data(),
-      //   id: doc.id,
-      // }));
-      // setQualityList(datas);
-      // setFilterData(datas);
+      const querySnapshot = await getDocs(QualityRef);
+      const datas = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setQualityList(datas);
+      setFilterData(datas);
     } catch (error) {
       console.log(error);
     }
@@ -139,146 +139,43 @@ export default function Quality() {
     if (!qualityName) {
       toast.warning("Please enter name");
     } else {
-      // await addDoc(QualityRef, {
-      //   QualityNm: qualityName,
-      //   date: currentDate,
-      // }).then((doc) => toast.success("SAVE"));
+      await addDoc(QualityRef, {
+        QualityNm: qualityName,
+        date: currentDate,
+      }).then((doc) => toast.success("SAVE"));
       setQualityName("");
       getQuality();
     }
   };
 
-  const QualityDelete = async (id) => {
-    try {
-      // deleteDoc(doc(QualityRef, id.target.value)).then(() =>
-      //   toast.success("DELETE")
-      // );
+  const QualityDelete =(id) => {
+  if(!id){
+    return toast.warning()
+  }
+    deleteDoc(doc(QualityRef, id)).then(() =>
+        toast.success("DELETE")
+      );
       getQuality();
-    } catch (error) {
-      console.error(error);
-    }
+      window.location.reload(false)
+  
   };
   return (
-    // <div className="bg-card py-1">    //
-    //   <ToastContainer
-    //     position="bottom-right"
-    //     autoClose={5000}
-    //     hideProgressBar={false}
-    //     newestOnTop={false}
-    //     closeOnClick
-    //     rtl={false}
-    //     pauseOnFocusLoss
-    //     draggable
-    //     pauseOnHover
-    //     theme="light"
-    //   />
-    //   <div className="card w-50 w-75 mx-auto">
-    //     <div className="card-header d-flex justify-content-center text-uppercase fs-3 fw-bold p-1">
-    //       Qulaity
-    //     </div>
-    //     <div className="card-body">
-    //       <div className="row">
-    //         <div className="col-12 d-flex">
-    //           <div className="d-flex col-6">
-    //             <div className="input-wrapper">
-    //               <input
-    //                 type="text"
-    //                 id="input"
-    //                 className="form-inp"
-    //                 required
-    //                 autocomplete="off"
-    //                 value={qualityName}
-    //                 onChange={(e) => {
-    //                   setQualityName(e.target.value);
-    //                 }}
-    //               />
-    //               <label for="input" className="form-lab text-capitalize ">
-    //                 Enter Name
-    //               </label>
-    //             </div>
-    //             <button
-    //               className="btn btn-success mt-2 px-4 fw-bold text-white text-uppercase fs-4"
-    //               onClick={QualitySave}
-    //             >
-    //               SAVE
-    //             </button>
-    //           </div>
-    //           <div className="d-flex  flex-row-reverse col-6">
-    //             <div className="bottom-0 end-0">
-    //               <div className="input-wrapper">
-    //                 <input
-    //                   type="text"
-    //                   id="input"
-    //                   className="form-inp"
-    //                   required
-    //                   autocomplete="off"
-    //                   onChange={searchQuality}
-    //                 />
-    //                 <label for="input" className="form-lab text-capitalize ">
-    //                   Search
-    //                 </label>
-    //               </div>
-    //             </div>
-    //           </div>
-    //         </div>
-    //         <div className="col"></div>
-    //       </div>
-    //       <div className="tableFixHead">
-    //         <table className="table">
-    //           <thead>
-    //             <tr>
-    //               <th scope="col" className="th1 text-capitalize">
-    //                 #
-    //               </th>
-    //               <th scope="col" className="th2 text-capitalize">
-    //                 particular
-    //               </th>
-    //               <th scope="col" className="th3 text-capitalize">
-    //                 date
-    //               </th>
-    //               <th scope="col" className="th4 text-capitalize">
-    //                 action
-    //               </th>
-    //             </tr>
-    //           </thead>
-    //           <tbody className="table-group-divider custom-tbody">
-    //             {filterData.map((quality, index) => (
-    //               <tr>
-    //                 <th className="th1">{index + 1}</th>
-    //                 <td className="th2 fs-5 ">{quality.QualityNm}</td>
-    //                 <td className="th3">{quality.date}</td>
-    //                 <td className="th4">
-    //                   <div className="d-flex">
-    //                     <button
-    //                       className="btn btn-primary text-white  fw-bold border-0 rounded-5 m-2"
-    //                       value={quality.id}
-    //                       onClick={() => {
-    //                         {
-    //                           setId(quality.id);
-    //                           setShowModel(true);
-    //                         }
-    //                       }}
-    //                     >
-    //                       UPDATE
-    //                     </button>
-    //                     <button
-    //                       className="btn btn-danger text-white  fw-bold border-0  rounded-5 m-2"
-    //                       value={quality.id}
-    //                       onClick={QualityDelete}
-    //                     >
-    //                       DELETE
-    //                     </button>
-    //                   </div>
-    //                 </td>
-    //               </tr>
-    //             ))}
-    //           </tbody>
-    //         </table>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </div>
-    <>
+  <>
+    <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"      
+      />
+
+  
+  
       {showModel && (
         <ShowModel
           id={id}
@@ -294,18 +191,18 @@ export default function Quality() {
         <div class="justify-content-between col-lg-8 mx-auto d-md-flex d-sm-inline-flex  ">
           <div class="d-flex py-2 mt-2  col-lg-4">
             <div class="input-wrapper">
-              <input type="text" id="input" class="form-inp" required />
+              <input type="text" id="input" class="form-inp" required value={qualityName} onChange={(e)=>qualityName(e.target.value)}/>
               <label for="input" class="form-lab">
                 Full name
               </label>
             </div>
-            <button class="btn btn-success py-2 px-3 text-white fw-bold text-uppercase rounded-0">
+            <button class="btn btn-success py-2 px-3 text-white fw-bold text-uppercase rounded-0" onClick={QualitySave}>
               Add
             </button>
           </div>
           <div class="d-flex mt-3 py-0">
             <div class="input-wrapper w-100">
-              <input type="text" id="input" class="form-inp p-3" required />
+              <input type="text" id="input" class="form-inp p-3" required onChange={searchQuality}/>
               <label for="input" class="form-lab">
                 Search
               </label>
@@ -332,27 +229,29 @@ export default function Quality() {
               </tr>
             </thead>
             <tbody class="table-group-divider">
+              {filterData.map((item,index)=>(
               <tr class="col-12">
                 <th scope="col" class="col-1">
-                  1
+                  {index+1}
                 </th>
                 <td scope="col" class="col">
-                  Mark
+                  {item.QualityNm}
                 </td>
                 <td scope="col" class="col">
-                  Otto
+                  {item.QualityDt}
                 </td>
                 <td scope="col" class="col">
                   <div class="d-flex">
-                    <button onClick={()=>setShowModel(true)} class="btn btn-primary rounded-5  text-white">
+                    <button onClick={()=>{setShowModel(true);setId(item.id)}} class="btn btn-primary rounded-5  text-white">
                       <i class="bi bi-pencil-square"></i>
                     </button>
-                    <button class="btn btn-danger rounded-5 mx-1 text-white">
+                    <button class="btn btn-danger rounded-5 mx-1 text-white" onClick={()=>QualityDelete(item.id)}>
                       <i class="bi bi-trash"></i>
                     </button>
                   </div>
                 </td>
               </tr>
+              ))}
             </tbody>
           </table>
         </div>
