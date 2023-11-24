@@ -1,258 +1,248 @@
 import { useEffect, useState } from "react";
-import "./master.css";
+import "../Master/master.css";
 import Select from "react-select";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { BiEdit, BiPlus, BiTrash } from "react-icons/bi";
+import { DB } from "../config/db.firebase";
 import {
-  All,
-  Update,
-  Create,
-  Delete,
-searchSupplier
-} from "../redux/Feature/SupplierSlice";
-
-const ShowModel = ({ id, close, btn }) => {
-  const [supplierData, setSupplierData] = useState();
-  var state, city, catagory;
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
+import { Link } from "react-router-dom";
+import { BiEdit, BiTrash } from "react-icons/bi";
+import { useDispatch, useSelector } from "react-redux";
+import { Create } from "../redux/Feature/CustomerWiseSlice";
+import { toast } from "react-toastify";
+const customerRef = collection(DB, "customer");
+const stateRef = collection(DB, "State");
+const catagoryRef = collection(DB, "Catagory");
+const cityRef = collection(DB, "City");
+const ShowModel = ({ id, close, change, btn }) => {
+  
+  const [customerData, setCustomerData] = useState();
+  const [customerList, setCustomerList] = useState([]);
+  const [supplierList, setSupplierList] = useState([]);
+  const [proccesList, setProccesList] = useState([]);
+  const [transportList, setTransportList] = useState([]);
+  const [qualityList, setQualityList] = useState([]);
+  const dispatch = useDispatch();
+  
+  const {transport} = useSelector((state)=>state.Transport);
   const onChangeHandlerForAll = (e) => {
-    setSupplierData({ ...supplierData, [e.target.name]: e.target.name });
+    setCustomerData({...customerData,[e.target.name]: e.target.value });
+    console.log(customerData);
   };
+  useEffect(()=>{
 
-  const save = () => {};
-  const update = () => {};
-
+  },[customerData])
+  const onSubmit = () => {
+    if (btn === "save") {
+      dispatch(Create(customerData)).then(() => {
+        toast.success("save");
+      });
+    } else {
+    }
+  };
   return (
     <>
       <div
         class="absolute top-0 left-0 bottom-0 right-0 z-50 p-5 flex justify-center"
         style={{ backgroundColor: "rgba(0, 0, 0, 0.26)" }}
       >
-        <div class="w-[700px] h-[670px] mt-10 relative bg-white rounded-2xl p-5">
-          <div class="text-2xl py-3">Supplier</div>
+        <div class="w-[700px] h-[450px] mt-10 relative bg-white rounded-2xl p-5">
+          <div class="text-2xl py-3">Customer Wise Entry</div>
           <div class="">
             <div class="">
-              <div class="w-full">
-                <div class="">
-                  <label for="input" class=" capitalize ">
-                    Enter Name
-                  </label>
-                  <input
-                    type="text"
-                    id="input"
-                    name="supplier"
-                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
-                    required
-                    value={supplierData?.Supplier}
-                    onChange={onChangeHandlerForAll}
-                  />
-                </div>
-              </div>
-              <div class="w-full">
-                <div class="">
+              {/* Row 1 */}
+              <div className="flex gap-3">
+                <div class="w-full">
                   <label for="input" class="form-labNm capitalize ">
-                    Select Catagory
+                    Select Customer
                   </label>
                   <Select
                     className="custom-select"
-                    name="catagory"
-                    value={supplierData?.catagory}
+                    name="customer"
+                    value={customerData?.customer}
                     onChange={onChangeHandlerForAll}
                     getOptionValue={(option) => option.Catagory}
                     getOptionLabel={(option) => option.Catagory}
-                    options={catagory}
+                    options={customerList}
                     isSearchable
                   />
                 </div>
-              </div>
-            </div>
-            <hr />
-            <div class="flex  item-center">
-              <div class="w-full">
-                <div class="">
-                  <label for="input" class=" capitalize ">
-                    Address 1
-                  </label>
-                  <input
-                    type="text"
-                    id="input"
-                    name="address1"
-                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
-                    required
-                    onChange={onChangeHandlerForAll}
-                    value={supplierData?.address1}
-                  />
-                </div>
-              </div>
-              <div class="w-full">
-                <div class="">
-                  <label for="input" class=" capitalize ">
-                    Address 2
-                  </label>
-                  <input
-                    type="text"
-                    id="input"
-                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
-                    required
-                    value={supplierData?.address2}
-                    onChange={onChangeHandlerForAll}
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="flex  item-center">
-              <div class="w-full">
-                <div class="">
-                  <label for="input" class=" capitalize ">
-                    Address 3
-                  </label>
-                  <input
-                    type="text"
-                    id="input"
-                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
-                    required
-                    value={supplierData?.address3}
-                    onChange={onChangeHandlerForAll}
-                  />
-                </div>
-              </div>
-              <div class="w-full">
-                <div class="">
-                  <label for="input" class=" capitalize ">
-                    Pincode
-                  </label>
-                  <input
-                    type="text"
-                    max="5"
-                    id="input"
-                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
-                    required
-                    onChange={onChangeHandlerForAll}
-                    value={supplierData?.pincode}
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="flex  item-center">
-              <div class="w-full">
-                <div class="">
+                <div class="w-full">
                   <label for="input" class="form-labNm capitalize ">
-                    City
+                    Select Suplier
                   </label>
                   <Select
-                    name="city"
-                    value={supplierData?.city}
+                    className="custom-select"
+                    name="supplier"
+                    value={customerData?.supplier}
                     onChange={onChangeHandlerForAll}
-                    getOptionValue={(option) => option.city}
-                    getOptionLabel={(option) => option.city}
-                    options={city}
+                    getOptionValue={(option) => option.Catagory}
+                    getOptionLabel={(option) => option.Catagory}
+                    options={supplierList}
                     isSearchable
                   />
                 </div>
               </div>
-              <div class="w-full">
-                <div class="">
+              {/* Row 2 */}
+              <div className="flex gap-3">
+                <div class="w-full">
                   <label for="input" class="form-labNm capitalize ">
-                    State
+                    Select Procces
                   </label>
                   <Select
-                    value={supplierData?.state}
+                    className="custom-select"
+                    value={customerData?.procces}
                     onChange={onChangeHandlerForAll}
-                    getOptionValue={(option) => option.state}
-                    getOptionLabel={(option) => option.state}
-                    options={state}
+                    getOptionValue={(option) => option.Catagory}
+                    getOptionLabel={(option) => option.Catagory}
+                    options={proccesList}
+                    isSearchable
+                  />
+                </div>
+                <div class="w-full">
+                  <label for="input" class="form-labNm capitalize ">
+                    Select Transport
+                  </label>
+                  <Select
+                    className="custom-select"
+                    name="transport"
+                    value={customerData?.transport}
+                    onChange={onChangeHandlerForAll}
+                    getOptionValue={(option) => option.Transport}
+                    getOptionLabel={(option) => option.Transport}
+                    options={transport}
+                    isSearchable
+                  />
+                </div>
+              </div>
+              {/* Row 3 */}
+              <div class="flex gap-3">
+                <div class="w-full">
+                  <label for="input" class=" capitalize ">
+                    Bill Date
+                  </label>
+                  <input
+                    type="text"
+                    id="input"
+                    name="billdate"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
+                    value={customerData?.date}
+                    required
+                    onChange={onChangeHandlerForAll}
+                  />
+                </div>
+                <div class="w-full">
+                  <label for="input" class=" capitalize ">
+                    Lot No
+                  </label>
+                  <input
+                    type="text"
+                    id="input"
+                    name="lotno"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
+                    value={customerData?.lotno}
+                    required
+                    onChange={onChangeHandlerForAll}
+                  />
+                </div>
+                <div class="w-full">
+                  <label for="input" class="form-labNm capitalize ">
+                    Select Quality
+                  </label>
+                  <Select
+                    className="custom-select"
+                    name="quality"
+                    value={customerData?.quality}
+                    onChange={onChangeHandlerForAll}
+                    getOptionValue={(option) => option.Catagory}
+                    getOptionLabel={(option) => option.Catagory}
+                    options={qualityList}
                     isSearchable
                   />
                 </div>
               </div>
             </div>
-            <div class="flex  item-center">
-              <div class="w-full">
-                <div class="">
+            {/* Row 4 */}
+            <div class="">
+              <div class="flex gap-3">
+                <div class="w-full">
                   <label for="input" class=" capitalize ">
-                    office Number 1
+                    pcs
                   </label>
                   <input
-                    type="tel"
+                    type="text"
                     id="input"
+                    name="pcs"
                     class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
                     required
-                    name="officeNo1"
-                    value={supplierData?.officeNo1}
                     onChange={onChangeHandlerForAll}
+                    value={customerData?.pcs}
                   />
                 </div>
-              </div>
-              <div class="w-full">
-                <div class="">
+                <div class="w-full">
                   <label for="input" class=" capitalize ">
-                    office Number 2
+                    Meter's
                   </label>
                   <input
-                    type="tel"
+                    type="text"
                     id="input"
+                    name="meter"
                     class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
                     required
-                    name="officeNo2"
-                    value={supplierData?.officeNo2}
                     onChange={onChangeHandlerForAll}
+                    value={customerData?.meter}
+                  />
+                </div>
+                <div class="w-full">
+                  <label for="input" class=" capitalize ">
+                    Rate
+                  </label>
+                  <input
+                    type="text"
+                    id="input"
+                    name="rate"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
+                    required
+                    onChange={onChangeHandlerForAll}
+                    value={customerData?.rate}
+                  />
+                </div>
+                <div class="w-full">
+                  <label for="input" class=" capitalize ">
+                    Bill Amt.
+                  </label>
+                  <input
+                    type="text"
+                    id="input"
+                    name="billamt"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
+                    required
+                    onChange={onChangeHandlerForAll}
+                    value={customerData?.billamt}
                   />
                 </div>
               </div>
             </div>
-            <div class="flex  item-center">
-              <div class="w-full">
-                <div class="">
-                  <label for="input" class=" capitalize ">
-                    mobile number
-                  </label>
-                  <input
-                    type="tel"
-                    id="input"
-                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
-                    required
-                    name="mobileNo"
-                    value={supplierData?.mobileNo}
-                    onChange={onChangeHandlerForAll}
-                  />
-                </div>
-              </div>
 
-              <div class="w-full">
-                <div class="">
-                  <label for="input" class="">
-                    email
-                  </label>
-                  <input
-                    type="text"
-                    id="input"
-                    name="email"
-                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
-                    required
-                    value={supplierData?.email}
-                    onChange={onChangeHandlerForAll}
-                  />
-                </div>
-              </div>
-            </div>
-            <hr />
             <div class="flex  justify-end gap-3 pt-5">
               <div class="bottom-0 end-0">
                 {btn == "save" ? (
                   <button
                     class="bg-green-500  font-bold rounded-xl px-5 py-3 uppercase"
-                    onClick={() => {
-                      save();
-                    }}
+                    onClick={onSubmit}
                   >
                     save
                   </button>
                 ) : (
                   <button
                     class="bg-blue-500 text-white font-bold rounded-xl px-5 py-3 uppercase"
-                    onClick={() => {
-                      update();
-                    }}
+                    onClick={onSubmit}
                   >
                     update
                   </button>
@@ -273,35 +263,32 @@ const ShowModel = ({ id, close, btn }) => {
     </>
   );
 };
-export default function Customer() {
-  const [showModel, setShowModel] = useState(true);
+export default function CustomerWise() {
+  const [showModel, setShowModel] = useState(false);
+  const [CustomerList, setCustomerList] = useState([]);
+  const [filterData, setFilterData] = useState([]);
   const [typeBtn, setTypeBtn] = useState();
   const [id, setId] = useState();
-  const [search, setSearch] = useState("");
-  const dispatch = useDispatch();
-  const { Supplier, loading } = useSelector(
-    (state) => state.Supplier
+
+  const { CustomerWise, loading, error } = useSelector(
+    (state) => state.CustomerWise
   );
-  
-  useEffect(() => {
-    dispatch(All());
-  }, [search]);  
-  
-  const [filtered, setFiltered] = useState([]);
-  useEffect(() => {
-    if (search.length === 0) {
-      setFiltered(Supplier);
-    } else {
-      const filteredData = Supplier.filter((item) =>
-        item.Supplier.toLowerCase().includes(search.toLowerCase())
-      );
-      setFiltered(filteredData);
-    }
-  }, [search, Supplier]);
+
+  const search = (e) => {
+    const data = CustomerList.filter((val) =>
+      val.Customer.toLowerCase().includes(e.target.value)
+    );
+    setFilterData(data);
+  };
+  console.log(CustomerWise);
+  useEffect(() => {}, []);
+
+  const deleteData = (e) => {};
+
   return (
     <>
       {showModel && (
-        <ShowModel id={id} close={() => setShowModel(false)} btn={typeBtn} />
+        <ShowModel close={() => setShowModel(false)} btn={typeBtn} />
       )}
       <div className="flex justify-center bg-white">
         <div>
@@ -310,13 +297,13 @@ export default function Customer() {
               home
             </Link>
             /
-            <Link to={"/supplier"} className="capitalize hover:font-medium">
-              Supplier
+            <Link to={"/customer"} className="capitalize hover:font-medium">
+              Customer
             </Link>
           </div>
           <div className="p-3 flex justify-between">
             <button
-              className="p-3 bg-blue-500 text-white uppercase rounded-2xl flex gap-3 items-center font-bold"
+              className="p-3 bg-blue-500 text-white uppercase rounded-2xl "
               onClick={() => {
                 {
                   setShowModel(true);
@@ -324,8 +311,7 @@ export default function Customer() {
                 }
               }}
             >
-              <BiPlus className="font-bold text-2xl" />
-              add
+              add costomer
             </button>
             <input
               type="text"
@@ -333,8 +319,7 @@ export default function Customer() {
               class="w-full px-3 py-3 border border-black rounded-2xl md:w-80"
               autocomplete="off"
               placeholder="Search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={search}
             />
           </div>
 
@@ -342,46 +327,37 @@ export default function Customer() {
             <table className="">
               <thead className="">
                 <tr className="flex items-center gap-3 bg-gray-300 px-3 py-2">
-                  <th scope="w-full" className="p-1 py-3 ">
+                  <th scope="w-full" className="p-1 w-full">
                     #
                   </th>
                   <th scope="w-full" className="w-28 flex">
-                    Supplier
+                    Date
                   </th>
                   <th scope="w-full" className="w-28 flex capitalize">
-                    Catagory
+                    lot No.
                   </th>
                   <th scope="w-full" className="w-64 flex capitalize">
-                    address
+                    Bill No.
                   </th>
                   <th scope="w-full" className="w-28 flex capitalize">
-                    pincode
+                    Quality
                   </th>
                   <th scope="w-full" className="w-28 flex capitalize">
-                    city
+                    Pcs
                   </th>
                   <th scope="w-full" className="w-36 flex capitalize">
-                    State
+                    Meter's
                   </th>
                   <th scope="w-full" className="w-36 flex capitalize">
-                    officeNo1
+                    Rate
                   </th>
                   <th scope="w-full" className="w-36 flex capitalize">
-                    officeNo1
-                  </th>
-                  <th scope="w-full" className="w-36 flex capitalize">
-                    MobileNo
-                  </th>
-                  <th scope="w-full" className="w-36 flex capitalize">
-                    email
-                  </th>
-                  <th scope="w-full" className="w-36 flex capitalize">
-                    action
+                    Bill Amt.
                   </th>
                 </tr>
               </thead>
               <tbody className="">
-                {filtered && filtered.map((doc, index) => (
+                {CustomerWise.map((doc, index) => (
                   <tr
                     key={index}
                     className="flex items-center gap-3 py-2 px-3 bg-gray-200 border-b border-gray-400"
@@ -393,63 +369,49 @@ export default function Customer() {
                       scope="w-full"
                       className="w-28 text-ellipsis overflow-hidden truncate"
                     >
-                      {doc.Supplier}
+                      {doc.date}
                     </td>
                     <td
                       scope="w-full"
                       className="w-28 text-ellipsis overflow-hidden truncate"
                     >
-                      {doc.Catagory}
+                      {doc.lotno}
                     </td>
                     <td
                       scope="w-full"
                       className="w-64 text-ellipsis overflow-hidden truncate"
                     >
-                      {doc.Address1}
-                      {doc.supplierData?.address2}
-                      {doc.Address3}
+                      {doc.billno}
                     </td>
                     <td
                       scope="w-full"
                       className="w-28 text-ellipsis overflow-hidden truncate"
                     >
-                      {doc.Pincode}
+                      {doc.quality}
                     </td>
                     <td
                       scope="w-full"
                       className="w-28 text-ellipsis overflow-hidden truncate"
                     >
-                      {doc.City}
+                      {doc.pcs}
                     </td>
                     <td
                       scope="w-full"
                       className="w-36 text-ellipsis overflow-hidden truncate"
                     >
-                      {doc.State}
+                      {doc.meter}
                     </td>
                     <td
                       scope="w-full"
                       className="w-36 text-ellipsis overflow-hidden truncate"
                     >
-                      {doc.OfficeNo1}
+                      {doc.rate}
                     </td>
                     <td
                       scope="w-full"
                       className="w-36 text-ellipsis overflow-hidden truncate"
                     >
-                      {doc.OfficeNo2}
-                    </td>
-                    <td
-                      scope="w-full"
-                      className="w-36 text-ellipsis overflow-hidden truncate"
-                    >
-                      {doc.MobileNo}
-                    </td>
-                    <td
-                      scope="w-full"
-                      className="w-36 text-ellipsis overflow-hidden truncate"
-                    >
-                      {doc.Email}
+                      {doc.billamt}
                     </td>
                     <td scope="w-full" className=" p-1 th4">
                       <div className="flex gap-3">
@@ -466,6 +428,7 @@ export default function Customer() {
                         <button
                           class="bg-red-500 text-white p-2 rounded-full text-2xl"
                           value={doc.id}
+                          onClick={deleteData}
                         >
                           <BiTrash />
                         </button>

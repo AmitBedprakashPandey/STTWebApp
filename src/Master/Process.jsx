@@ -11,6 +11,8 @@ import {
   getDocs,
   updateDoc,
 } from "firebase/firestore";
+import { Link } from "react-router-dom";
+import { BiEdit, BiTrash, BiX } from "react-icons/bi";
 const cityRef = collection(DB, "City");
 const proccessRef = collection(DB, "Process");
 const stateRef = collection(DB, "State");
@@ -157,31 +159,32 @@ const ShowModel = ({ id, close, change, btn }) => {
   };
   return (
     <>
-      <div class="modelBg ">
-        <div class=" card Main-Model ">
-          <button className="btn-close closebtn" onClick={close} />
-          <div class="card-header d-flex justify-content-center text-uppercase fs-3 fw-bold ">
+      <div class="absolute top-0 bottom-0 right-0 left-0 z-50 p-5 flex justify-center"  style={{ backgroundColor: "rgba(0, 0, 0, 0.26)" }} >
+        <div class="w-[700px] h-[800px] mt-10 relative bg-white rounded-2xl p-5">          
+          <div class="text-2xl py-3">
             Proccess
           </div>
-          <div class="card-body">
-            <div class="row">
+          <div class="">
+            <div class="">
               <div class="col">
-                <div class="input-wrapper">
+                <div class="">
+                  <label for="input" class="capitalize ">
+                    Enter Name
+                  </label>
                   <input
                     type="text"
                     id="input"
-                    class="form-inp"
-                    value={proccess}
-                    required
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
+                    value={proccess}                    
                     onChange={(e) => setProccess(e.target.value)}
                   />
-                  <label for="input" class="form-lab text-capitalize ">
-                    Enter Name
-                  </label>
                 </div>
               </div>
               <div class="col">
-                <div class="input-wrapper">
+                <div class="">
+                  <label for="input" class="capitalize ">
+                    Select Catagory
+                  </label>
                   <Select
                     className="custom-select"
                     value={selectCtg}
@@ -191,81 +194,84 @@ const ShowModel = ({ id, close, change, btn }) => {
                     options={catagoryList}
                     isSearchable
                   />
-                  <label for="input" class="form-labNm text-capitalize ">
-                    Select Catagory
-                  </label>
                 </div>
               </div>
-            </div>
-            <hr />
-            <div class="row">
-              <div class="col">
-                <div class="input-wrapper">
+            </div>            
+            <div class="">
+              <div class="w-full">
+                <div class="flex flex-col">
+                  <label for="input" class="capitalize ">
+                    Address 1
+                  </label>
                   <input
                     type="text"
                     id="input"
-                    class="form-inp"
+                    class="rounded-lg px-3 py-2 border border-black text-lg placeholder:capitalize"
+                    placeholder="Address1"
                     required
                     value={address1}
                     onChange={(e) => setAddress1(e.target.value)}
                   />
-                  <label for="input" class="form-lab text-capitalize ">
-                    Address 1
-                  </label>
                 </div>
               </div>
-              <div class="col">
-                <div class="input-wrapper">
+              <div class="w-full">
+                <div class="flex flex-col">
+                  <label for="input" class="capitalize ">
+                    Address 2
+                  </label>
                   <input
                     type="text"
                     id="input"
-                    class="form-inp"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
                     required
+                    placeholder="address2"
                     value={address2}
                     onChange={(e) => setAddress2(e.target.value)}
                   />
-                  <label for="input" class="form-lab text-capitalize ">
-                    Address 2
-                  </label>
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col">
-                <div class="input-wrapper">
+            <div class="">
+              <div class="w-full">
+                <div class="flex flex-col">
+                  <label for="input" class="capitalize ">
+                    Address 3
+                  </label>
                   <input
                     type="text"
                     id="input"
-                    class="form-inp"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
                     required
+                    placeholder="address3"
                     value={address3}
                     onChange={(e) => setAddress3(e.target.value)}
                   />
-                  <label for="input" class="form-lab text-capitalize ">
-                    Address 3
-                  </label>
                 </div>
               </div>
               <div class="col">
-                <div class="input-wrapper">
+                <div class="">
+                  <label for="input" class="capitalize ">
+                    Pincode
+                  </label>
                   <input
                     type="text"
                     max="5"
                     id="input"
-                    class="form-inp"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
                     required
+                    placeholder="pincode"
                     onChange={(e) => setPincode(e.target.value)}
                     value={pincode}
                   />
-                  <label for="input" class="form-lab text-capitalize ">
-                    Pincode
-                  </label>
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col">
-                <div class="input-wrapper">
+            <div class="flex gap-3 items-center">
+              <div class="w-full">
+                <div class="">
+                  <label for="input" class="capitalize ">
+                    City
+                  </label>
                   <Select
                     value={selectCity}
                     onChange={citySelectChange}
@@ -274,13 +280,13 @@ const ShowModel = ({ id, close, change, btn }) => {
                     options={cityList}
                     isSearchable
                   />
-                  <label for="input" class="form-labNm text-capitalize ">
-                    City
-                  </label>
                 </div>
               </div>
-              <div class="col">
-                <div class="input-wrapper">
+              <div class="w-full">
+                <div class="">
+                  <label for="input" class="capitalize ">
+                    State
+                  </label>
                   <Select
                     value={selectState}
                     onChange={stateSelectChange}
@@ -289,83 +295,78 @@ const ShowModel = ({ id, close, change, btn }) => {
                     options={stateList}
                     isSearchable
                   />
-                  <label for="input" class="form-labNm text-capitalize ">
-                    State
-                  </label>
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col">
-                <div class="input-wrapper">
+            <div class="flex gap-3 items-center">
+              <div class="w-full">
+                <div class="">
+                  <label for="input" class="capitalize ">
+                    office Number 1
+                  </label>
                   <input
                     type="tel"
                     id="input"
-                    class="form-inp"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
                     required
                     value={officeNo1}
                     onChange={(e) => setofficeNo1(e.target.value)}
                   />
-                  <label for="input" class="form-lab text-capitalize ">
-                    office Number 1
-                  </label>
                 </div>
               </div>
-              <div class="col">
+              <div class="w-full">
                 <div class="input-wrapper">
+                  <label for="input" class="capitalize ">
+                    office Number 2
+                  </label>
                   <input
                     type="tel"
                     id="input"
-                    class="form-inp"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
                     required
                     value={officeNo2}
                     onChange={(e) => setofficeNo2(e.target.value)}
                   />
-                  <label for="input" class="form-lab text-capitalize ">
-                    office Number 2
-                  </label>
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col">
-                <div class="input-wrapper">
+            <div class="flex gap-3 items-center">
+              <div class="w-full">
+                <div class="flex flex-col">
+                  <label for="input" class="capitalize ">
+                    mobile number
+                  </label>
                   <input
                     type="tel"
                     id="input"
-                    class="form-inp"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
                     required
                     value={mobileNo}
                     onChange={(e) => setMobileNo(e.target.value)}
                   />
-                  <label for="input" class="form-lab text-capitalize ">
-                    mobile number
-                  </label>
                 </div>
               </div>
-
-              <div class="col">
-                <div class="input-wrapper">
+              <div class="w-full">
+                <div class="flex flex-col">
+                  <label for="input" class="capitalize">
+                    email
+                  </label>
                   <input
                     type="text"
                     id="input"
-                    class="form-inp"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
-                  <label for="input" class="form-lab">
-                    email
-                  </label>
                 </div>
               </div>
-            </div>
-            <hr />
-            <div class="d-flex  flex-row-reverse">
-              <div class="bottom-0 end-0">
+            </div>  
+            <div class="flex justify-end pt-5 gap-3">
+              <div class="">
                 {btn == "save" ? (
                   <button
-                    class="btn btn-success text-white fw-bold   rounded-2 px-5 py-2 m-2 text-uppercase"
+                  class="bg-green-500 text-white font-bold rounded-xl px-5 py-3 uppercase"
                     onClick={() => {
                       save();
                       clearInput();
@@ -376,7 +377,7 @@ const ShowModel = ({ id, close, change, btn }) => {
                   </button>
                 ) : (
                   <button
-                    class="btn btn-primary text-white fw-bold   rounded-2 px-5 py-2 m-2 text-uppercase"
+                  class="bg-blue-500 text-white font-bold rounded-xl px-5 py-3 uppercase"
                     onClick={() => {
                       update();
                       change();
@@ -385,6 +386,11 @@ const ShowModel = ({ id, close, change, btn }) => {
                     update
                   </button>
                 )}
+              </div>
+              <div class="">
+                <button onClick={close} class="bg-red-500 text-white font-bold rounded-xl px-5 py-3 uppercase">
+                  cancel
+                </button>
               </div>
             </div>
           </div>
@@ -434,10 +440,20 @@ export default function Proccess() {
           btn={typeBtn}
         />
       )}
-      <div className="row">
-        <div className="col my-3">
+      <div className="flex justify-center bg-white"> 
+      <div>          
+      <div class="flex gap-2 px-4 py-3 w-full">
+          <Link to={"/"} className="capitalize hover:font-medium">
+            home
+          </Link>
+          /
+          <Link to={"/process"} className="capitalize hover:font-medium">
+            quality
+          </Link>
+        </div>
+        <div className="px-4 py-3 flex justify-between">
           <button
-            className="btn btn-danger text-white fw-bold  rounded-4 m-2 update text-capitalize border-0 "
+            className="p-3 bg-blue-500 text-white uppercase rounded-2xl"
             onClick={() => {
               {
                 setShowModel(true);
@@ -447,128 +463,113 @@ export default function Proccess() {
           >
             add costomer
           </button>
-        </div>
-        <div className="col-3">
-          <div class="input-wrapper">
+          <div className="">
             <input
               type="text"
               id="input"
-              class="form-inp"
+              class="w-full px-3 py-3 border rounded-2xl md:w-80"
               autocomplete="off"
               placeholder="Search"
               onChange={search}
             />
           </div>
-        </div>
-      </div>
-      <div className="tableFixHead p-1">
-        <table className="table">
-          <thead className="custom-thead">
-            <tr className="">
-              <th scope="col" className="p-1 col">
+        </div> 
+      <div className="flex justify-center p-3">
+        <table className="">
+          <thead className="">
+            <tr className="flex items-center gap-3 bg-gray-300 px-3 py-2">
+              <th scope="col" className="">
                 #
               </th>
-              <th scope="col" className="p-1 col th4 text-capitalize">
+              <th scope="col" className="w-28 flex">
                 Proccess
               </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
+              <th scope="col" className="w-28 flex capitalize">
                 Catagory
               </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
-                address1
-              </th>
-              <th scope="col" className="p-1 th4  text-capitalize">
-                address2
-              </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
-                address3
-              </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
+              <th scope="col" className="w-64 flex capitalize">
+                address
+              </th>            
+              <th scope="col" className="w-20 flex capitalize">
                 pincode
               </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
+              <th scope="col" className="w-28 flex capitalize">
                 city
               </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
+              <th scope="col" className="w-36 flex capitalize">
                 State
               </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
+              <th scope="col" className="w-36 flex capitalize">
                 officeNo1
               </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
+              <th scope="col" className="w-36 flex capitalize">
                 officeNo1
               </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
+              <th scope="col" className="w-36 flex capitalize">
                 MobileNo
               </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
+              <th scope="col" className="w-36 flex capitalize">
                 email
               </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
+              <th scope="col" className="w-36 flex capitalize">
                 action
               </th>
             </tr>
           </thead>
-          <tbody className="table-group-divider custom-tbody">
+          <tbody className="">
             {filterData.map((doc, index) => (
-              <tr key={index} className="d-flex">
-                <td scope="col" className="p-1 py-3 ">
+              <tr key={index} className="flex items-center gap-3 py-2 px-3 bg-gray-200 border-b border-gray-400">
+                <td scope="col" className="">
                   {index + 1}
                 </td>
-                <td scope="col" className="p-1 py-3 th4">
+                <td scope="col" className="w-28 text-ellipsis overflow-hidden truncate">
                   {doc.Proccess}
                 </td>
-                <td scope="col" className="p-1 py-3 th4">
+                <td scope="col" className="w-28 text-ellipsis overflow-hidden truncate">
                   {doc.Catagory}
                 </td>
-                <td scope="col" className="p-1 py-3 th4">
-                  {doc.Address1}
+                <td scope="col" className="w-64 text-ellipsis overflow-hidden truncate">
+                  {doc.Address1}{doc.Address2}{doc.Address3}
                 </td>
-                <td scope="col" className="p-1 py-3 th4">
-                  {doc.Address2}
-                </td>
-                <td scope="col" className="p-1 py-3 th4">
-                  {doc.Address3}
-                </td>
-                <td scope="col" className="p-1 py-3 th4">
+                <td scope="col" className="w-20">
                   {doc.Pincode}
                 </td>
-                <td scope="col" className="p-1 py-3 th4">
+                <td scope="col" className="w-28 text-ellipsis overflow-hidden truncate">
                   {doc.City}
                 </td>
-                <td scope="col" className="p-1 py-3 th4">
+                <td scope="col" className="w-36 text-ellipsis overflow-hidden truncate">
                   {doc.State}
                 </td>
-                <td scope="col" className="p-1 py-3 th4">
+                <td scope="col" className="w-36 text-ellipsis overflow-hidden truncate">
                   {doc.OfficeNo1}
                 </td>
-                <td scope="col" className="p-1 py-3 th4">
+                <td scope="col" className="w-36 text-ellipsis overflow-hidden truncate">
                   {doc.OfficeNo2}
                 </td>
-                <td scope="col" className="p-1 py-3 th4">
+                <td scope="col" className="w-36 text-ellipsis overflow-hidden truncate">
                   {doc.MobileNo}
                 </td>
-                <td scope="col" className="p-1 py-3 th4">
+                <td scope="col" className="w-36 text-ellipsis overflow-hidden truncate">
                   {doc.Email}
                 </td>
-                <td scope="col" className=" p-1 th4">
-                  <div className="d-flex">
+                <td scope="col" className=" p-1">
+                  <div className="flex gap-5">
                     <button
-                      className="btn btn-primary text-white fw-bold  rounded-5 m-1 update"
+                    class="bg-blue-500 text-white p-2 rounded-full text-2xl"
                       onClick={() => {
                         setShowModel(true);
                         setTypeBtn("update");
                         setId(doc.id);
                       }}
                     >
-                      U
+                      <BiEdit/>
                     </button>
                     <button
-                      className="btn btn-danger text-white fw-bold  rounded-5 m-1 delete"
+                  class="bg-red-500 text-white p-2 rounded-full text-2xl"
                       value={doc.id}
                       onClick={deleteData}
                     >
-                      D
+                 <BiTrash/>
                     </button>
                   </div>
                 </td>
@@ -576,6 +577,8 @@ export default function Proccess() {
             ))}
           </tbody>
         </table>
+      </div>
+      </div>
       </div>
     </>
   );

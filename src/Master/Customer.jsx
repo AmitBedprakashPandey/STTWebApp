@@ -1,384 +1,282 @@
 import { useEffect, useState } from "react";
 import "./master.css";
 import Select from "react-select";
-import { DB } from "../config/db.firebase";
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  updateDoc,
-} from "firebase/firestore";
-const customerRef = collection(DB, "customer");
-const stateRef = collection(DB, "State");
-const catagoryRef = collection(DB, "Catagory");
-const cityRef = collection(DB, "City");
-const ShowModel = ({ id, close, change, btn }) => {  
-  const [selectedCatagory, setSelectedCatagory] = useState();
-  const [customer, setCustomer] = useState();
-  const [address1, setAddress1] = useState();
-  const [address2, setAddress2] = useState();
-  const [address3, setAddress3] = useState();
-  const [pincode, setPincode] = useState();
-  const [selectedCity, setSelectedCity] = useState();
-  const [selectedState, setSelectedState] = useState();
-  const [officeNo1, setofficeNo1] = useState();
-  const [officeNo2, setofficeNo2] = useState();
-  const [mobileNo, setMobileNo] = useState();
-  const [email, setEmail] = useState();
-  const [cityList, setCityList] = useState([]);
-  const [stateList, setStateList] = useState([]);
-  const [catagoryList, setCatagoryList] = useState([]);
 
-  const clearInput = () => {
-    setCustomer("");
-    setSelectedCatagory("");
-    setAddress1("");
-    setAddress2("");
-    setAddress3("");
-    setPincode("");
-    setSelectedCity("");
-    setSelectedState("");
-    setofficeNo1("");
-    setofficeNo2("");
-    setMobileNo("");
-    setEmail("");
-  };
-  const [selectCtg, setSelectCtg] = useState();
-  const catagorySelectChange = (selectedOption) => {
-    setSelectedCatagory(selectedOption.Catagory);
-    setSelectCtg(selectedOption);
-  };
-  const getCatagory = async () => {
-    const datas = await getDocs(catagoryRef);
-    const sortData = datas.docs.map((doc) => ({
-      ...doc.data(),
-    }));
-    setCatagoryList(sortData);
-  };
-  const [selectCity, setSelectCity] = useState();
-  const citySelectChange = (selectedOption) => {
-    setSelectCity(selectedOption);
-    setSelectedCity(selectedOption.CityNm);
-  };
-  const getCity = async () => {
-    const datas = await getDocs(cityRef);
-    const sortData = datas.docs.map((doc) => ({
-      ...doc.data(),
-    }));
-    setCityList(sortData);
-  };
-  const [selectState, setSelectState] = useState();
-  const stateSelectChange = (selectedOption) => {
-    setSelectState(selectedOption);
-    setSelectedState(selectedOption.state);
-  };
-  const getState = async () => {
-    const datas = await getDocs(stateRef);
-    const sortData = datas.docs.map((doc) => ({
-      ...doc.data(),
-    }));
-    setStateList(sortData);
-  };
-  const getOldData = async () => {
-    const datas = await getDoc(doc(customerRef, id));
-    setCustomer(datas.data().Customer);
-    setSelectedCatagory(datas.data().Catagory);
-    setAddress1(datas.data().Address1);
-    setAddress2(datas.data().Address2);
-    setAddress3(datas.data().Address3);
-    setPincode(datas.data().Pincode);
-    setSelectedCity(datas.data().City);
-    setSelectedState(datas.data().State);
-    setofficeNo1(datas.data().OfficeNo1);
-    setofficeNo2(datas.data().OfficeNo2);
-    setMobileNo(datas.data().MobileNo);
-    setEmail(datas.data().Email);
-  };
+import { Link } from "react-router-dom";
+import { BiEdit, BiTrash } from "react-icons/bi";
+import { useDispatch, useSelector } from "react-redux";
+import { All, Create, Delete, Update } from "../redux/Feature/CustomerSlice";
+
+const ShowModel = ({ id, close, btn }) => {
+  const [inputData, setInputData] = useState();
+  const { Customer, loading } = useSelector((state) => state.Customer);
+  const dispatch = useDispatch();
+  var catagory, city, state;
+
   useEffect(() => {
-    if (btn === "update") {
-      getOldData();
-      getCatagory();
-      getCity();
-      getState();
+    if (id) {
+      const single = Customer.filter((doc) => doc.id === id);
+      console.log(single[0]);
+      setInputData(single[0]);
     }
+    document.body.style.overflowY = "hidden";
+    return () => (document.body.style.overflowY = "scroll");
   }, []);
+
+  const onchangeHandler = (e) => {
+    setInputData({ ...inputData, [e.target.name]: e.target.value });
+  };
   const save = () => {
-    const data = {
-      Customer: customer,
-      Catagory: selectedCatagory,
-      Address1: address1,
-      Address2: address2,
-      Address3: address3,
-      Pincode: pincode,
-      City: selectedCity,
-      State: selectedState,
-      OfficeNo1: officeNo1,
-      OfficeNo2: officeNo2,
-      MobileNo: mobileNo,
-      Email: email,
-    };
-    try {
-      addDoc(customerRef, data).then(() => {
-        alert("save");
-        clearInput();
-      });
-    } catch (error) {
-      console.error(error);
-    }
+    dispatch(Create(inputData));
+    setInputData("");
   };
   const update = () => {
-    const data = {
-      Customer: customer,
-      Catagory: selectedCatagory,
-      Address1: address1,
-      Address2: address2,
-      Address3: address3,
-      Pincode: pincode,
-      City: selectedCity,
-      State: selectedState,
-      OfficeNo1: officeNo1,
-      OfficeNo2: officeNo2,
-      MobileNo: mobileNo,
-      Email: email,
-    };
-    const getdata = doc(customerRef, id);
-    updateDoc(getdata, data).then(() => {
-            getOldData();
-    });
+    dispatch(update(inputData));
+    close();
   };
   return (
     <>
-      <div class="modelBg ">
-        <div class="  card Main-Model">
-        <button className="btn-close closebtn" onClick={close} />
-          <div class="card-header d-flex justify-content-center text-uppercase fs-3 fw-bold ">
-            Customer
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col">
-                <div class="input-wrapper">
+      <div
+        class="absolute top-0 left-0 bottom-0 right-0 z-50 p-5 flex justify-center"
+        style={{ backgroundColor: "rgba(0, 0, 0, 0.26)" }}
+      >
+        <div class="w-[700px] h-[670px] mt-10 relative bg-white rounded-2xl p-5">
+          <div class="text-2xl py-3">Proccess</div>
+          <div class="">
+            <div class="">
+              <div class="w-full">
+                <div class="">
+                  <label for="input" class=" capitalize ">
+                    Enter Name
+                  </label>
                   <input
                     type="text"
                     id="input"
-                    class="form-inp"
-                    value={customer}
+                    name="Customer"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
+                    value={inputData?.Customer}
                     required
-                    onChange={(e) => setCustomer(e.target.value)}
+                    onChange={onchangeHandler}
                   />
-                  <label for="input" class="form-lab text-capitalize ">
-                    Enter Name
-                  </label>
                 </div>
               </div>
-              <div class="col">
-                <div class="input-wrapper">
-                <Select
-                  className="custom-select"
-                    value={selectCtg}
-                    onChange={catagorySelectChange}
-                    getOptionValue={(option) => option.Catagory}
-                    getOptionLabel={(option) => option.Catagory}
-                    options={catagoryList}
-                    isSearchable
-                  />
-                  <label for="input" class="form-labNm text-capitalize ">
+              <div class="w-full">
+                <div class="">
+                  <label for="input" class="form-labNm capitalize ">
                     Select Catagory
                   </label>
+                  <Select
+                    className="custom-select"
+                    name="Catagory"
+                    defaultInputValue={inputData?.Catagory}
+                    onChange={onchangeHandler}
+                    getOptionValue={(option) => option.Catagory}
+                    getOptionLabel={(option) => option.Catagory}
+                    options={catagory}
+                    isSearchable
+                  />
                 </div>
               </div>
             </div>
             <hr />
-            <div class="row">
-              <div class="col">
-                <div class="input-wrapper">
-                  <input
-                    type="text"
-                    id="input"
-                    class="form-inp"
-                    required
-                    value={address1}
-                    onChange={(e) => setAddress1(e.target.value)}
-                  />
-                  <label for="input" class="form-lab text-capitalize ">
+            <div class="flex  item-center">
+              <div class="w-full">
+                <div class="">
+                  <label for="input" class=" capitalize ">
                     Address 1
                   </label>
-                </div>
-              </div>
-              <div class="col">
-                <div class="input-wrapper">
                   <input
                     type="text"
                     id="input"
-                    class="form-inp"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
                     required
-                    value={address2}
-                    onChange={(e) => setAddress2(e.target.value)}
+                    name="address1"
+                    onChange={onchangeHandler}
+                    value={inputData?.address1}
                   />
-                  <label for="input" class="form-lab text-capitalize ">
+                </div>
+              </div>
+              <div class="w-full">
+                <div class="">
+                  <label for="input" class=" capitalize ">
                     Address 2
                   </label>
+                  <input
+                    type="text"
+                    id="input"
+                    name="address2"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
+                    required
+                    value={inputData?.address2}
+                    onChange={onchangeHandler}
+                  />
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col">
-                <div class="input-wrapper">
+            <div class="flex  item-center">
+              <div class="w-full">
+                <div class="">
+                  <label for="input" class=" capitalize ">
+                    Address 3
+                  </label>
                   <input
                     type="text"
                     id="input"
-                    class="form-inp"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
                     required
-                    value={address3}
-                    onChange={(e) => setAddress3(e.target.value)}
+                    name="address3"
+                    value={inputData?.address3}
+                    onChange={onchangeHandler}
                   />
-                  <label for="input" class="form-lab text-capitalize ">
-                    Address 3
-                  </label>
                 </div>
               </div>
-              <div class="col">
-                <div class="input-wrapper">
+              <div class="w-full">
+                <div class="">
+                  <label for="input" class=" capitalize ">
+                    Pincode
+                  </label>
                   <input
                     type="text"
                     max="5"
+                    name="pincode"
                     id="input"
-                    class="form-inp"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
                     required
-                    onChange={(e) => setPincode(e.target.value)}
-                    value={pincode}
+                    onChange={onchangeHandler}
+                    value={inputData?.pincode}
                   />
-                  <label for="input" class="form-lab text-capitalize ">
-                    Pincode
-                  </label>
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col">
-                <div class="input-wrapper">
-                <Select
-                    value={selectCity}
-                    onChange={citySelectChange}
-                    getOptionValue={(option) => option.CityNm}
-                    getOptionLabel={(option) => option.CityNm}
-                    options={cityList}
-                    isSearchable
-                  />
-                  <label for="input" class="form-labNm text-capitalize ">
+            <div class="flex  item-center">
+              <div class="w-full">
+                <div class="">
+                  <label for="input" class="form-labNm capitalize ">
                     City
                   </label>
-                </div>
-              </div>
-              <div class="col">
-                <div class="input-wrapper">
-                <Select
-                    value={selectState}
-                    onChange={stateSelectChange}
-                    getOptionValue={(option) => option.state}
-                    getOptionLabel={(option) => option.state}
-                    options={stateList}
+                  <Select
+                    name="city"
+                    value={inputData?.city}
+                    onChange={onchangeHandler}
+                    getOptionValue={(option) => option.CityNm}
+                    getOptionLabel={(option) => option.CityNm}
+                    options={city}
                     isSearchable
                   />
-                  <label for="input" class="form-labNm text-capitalize ">
+                </div>
+              </div>
+              <div class="w-full">
+                <div class="">
+                  <label for="input" class="form-labNm capitalize ">
                     State
                   </label>
+                  <Select
+                    name="state"
+                    value={inputData?.state}
+                    onChange={onchangeHandler}
+                    getOptionValue={(option) => option.state}
+                    getOptionLabel={(option) => option.state}
+                    options={state}
+                    isSearchable
+                  />
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col">
-                <div class="input-wrapper">
-                  <input
-                    type="tel"
-                    id="input"
-                    class="form-inp"
-                    required
-                    value={officeNo1}
-                    onChange={(e) => setofficeNo1(e.target.value)}
-                  />
-                  <label for="input" class="form-lab text-capitalize ">
+            <div class="flex  item-center">
+              <div class="w-full">
+                <div class="">
+                  <label for="input" class=" capitalize ">
                     office Number 1
                   </label>
-                </div>
-              </div>
-              <div class="col">
-                <div class="input-wrapper">
                   <input
                     type="tel"
                     id="input"
-                    class="form-inp"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
                     required
-                    value={officeNo2}
-                    onChange={(e) => setofficeNo2(e.target.value)}
+                    name="officeNo1"
+                    value={inputData?.officeNo1}
+                    onChange={onchangeHandler}
                   />
-                  <label for="input" class="form-lab text-capitalize ">
+                </div>
+              </div>
+              <div class="w-full">
+                <div class="">
+                  <label for="input" class=" capitalize ">
                     office Number 2
                   </label>
+                  <input
+                    type="tel"
+                    id="input"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
+                    required
+                    name="officeNo2"
+                    value={inputData?.officeNo2}
+                    onChange={onchangeHandler}
+                  />
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col">
-                <div class="input-wrapper">
+            <div class="flex  item-center">
+              <div class="w-full">
+                <div class="">
+                  <label for="input" class=" capitalize ">
+                    mobile number
+                  </label>
                   <input
                     type="tel"
                     id="input"
-                    class="form-inp"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
                     required
-                    value={mobileNo}
-                    onChange={(e) => setMobileNo(e.target.value)}
+                    name="mobileNo"
+                    value={inputData?.mobileNo}
+                    onChange={onchangeHandler}
                   />
-                  <label for="input" class="form-lab text-capitalize ">
-                    mobile number
-                  </label>
                 </div>
               </div>
 
-              <div class="col">
-                <div class="input-wrapper">
+              <div class="w-full">
+                <div class="">
+                  <label for="input" class="">
+                    email
+                  </label>
                   <input
                     type="text"
                     id="input"
-                    class="form-inp"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    name="email"
+                    value={inputData?.email}
+                    onChange={onchangeHandler}
                   />
-                  <label for="input" class="form-lab">
-                    email
-                  </label>
                 </div>
               </div>
             </div>
             <hr />
-            <div class="d-flex  flex-row-reverse">
+            <div class="flex  justify-end gap-3 pt-5">
               <div class="bottom-0 end-0">
                 {btn == "save" ? (
                   <button
-                    class="btn btn-success text-white fw-bold   rounded-2 px-5 py-2 m-2 text-uppercase"
-                    onClick={() => {
-                      save();
-                      clearInput();
-                      change();
-                    }}
+                    class="bg-green-500 text-white font-bold rounded-xl px-5 py-3 uppercase"
+                    onClick={save}
                   >
                     save
                   </button>
                 ) : (
                   <button
-                    class="btn btn-primary text-white fw-bold   rounded-2 px-5 py-2 m-2 text-uppercase"
-                    onClick={() => {
-                      update();
-                      change();
-                    }}
+                    class="bg-blue-500 text-white font-bold rounded-xl px-5 py-3 uppercase"
+                    onClick={update}
                   >
                     update
                   </button>
                 )}
+              </div>
+              <div class="bottom-0 end-0">
+                <button
+                  class="bg-red-500 text-white font-bold rounded-xl px-5 py-3 uppercase"
+                  onClick={close}
+                >
+                  cancel
+                </button>
               </div>
             </div>
           </div>
@@ -389,186 +287,207 @@ const ShowModel = ({ id, close, change, btn }) => {
 };
 export default function Customer() {
   const [showModel, setShowModel] = useState(false);
-  const [CustomerList, setCustomerList] = useState([]);
-  const [filterData, setFilterData] = useState([]);
   const [typeBtn, setTypeBtn] = useState();
-  const [id, setId] = useState();  
-  const getCostomer = async () => {
-    const data = await getDocs(customerRef);
-    const recod = data.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-    }));
-    setCustomerList(recod);
-    setFilterData(recod);
-  };
-  const search = (e) => {
-    const data = CustomerList.filter((val) =>
-      val.Customer.toLowerCase().includes(e.target.value)
-    );
-    setFilterData(data);
-  };
+  const [id, setId] = useState();
+  const { Customer, loading } = useSelector((state) => state.Customer);
+  const dispatch = useDispatch();
+  
   useEffect(() => {
-    getCostomer();
+  
   }, []);
-  const deleteData = (e) => {
-    deleteDoc(doc(customerRef, e.target.value)).then(() => {
-      alert("Delete");
-      getCostomer();
-    });
-  };
+
+  const [search, setSearch] = useState("");
+  const [filtered, setFiltered] = useState([]);
+  useEffect(() => {
+    if (search.length === 0) {
+      setFiltered(Customer);
+    } else {
+      const filteredData = Customer.filter((item) =>
+        item.Customer.toLowerCase().includes(search.toLowerCase())
+      );
+      setFiltered(filteredData);
+    }
+  }, [search, Customer]);
+
   return (
     <>
       {showModel && (
-        <ShowModel
-          id={id}
-          close={() => setShowModel(false)}
-          change={getCostomer}
-          btn={typeBtn}
-        />
+        <ShowModel id={id} close={() => setShowModel(false)} btn={typeBtn} />
       )}
-      <div className="row">
-        <div className="col my-3">
-          <button
-            className="btn btn-danger text-white fw-bold  rounded-4 m-2 update text-capitalize border-0 "
-            onClick={() => {
-              {
-                setShowModel(true);
-                setTypeBtn("save");
-              }
-            }}
-          >
-            add costomer
-          </button>
-        </div>
-        <div className="col-3">
-          <div class="input-wrapper">
+      <div className="flex justify-center bg-white">
+        <div>
+          <div class="flex gap-2 px-4 py-3 w-full">
+            <Link to={"/"} className="capitalize hover:font-medium">
+              home
+            </Link>
+            /
+            <Link to={"/Customer"} className="capitalize hover:font-medium">
+              Customer
+            </Link>
+          </div>
+          <div className="p-3 flex justify-between">
+            <button
+              className="p-3 bg-blue-500 text-white uppercase rounded-2xl "
+              onClick={() => {
+                {
+                  setShowModel(true);
+                  setTypeBtn("save");
+                }
+              }}
+            >
+              add costomer
+            </button>
             <input
               type="text"
               id="input"
-              class="form-inp"
+              class="w-full px-3 py-3 border border-black rounded-2xl md:w-80"
               autocomplete="off"
               placeholder="Search"
-              onChange={search}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
+
+          <div className="flex justify-center p-3">
+            <table className="">
+              <thead className="">
+                <tr className="flex items-center gap-3 bg-gray-300 px-3 py-2">
+                  <th scope="w-full" className="p-1 py-3 ">
+                    #
+                  </th>
+                  <th scope="w-full" className="w-28 flex">
+                    Customer
+                  </th>
+                  <th scope="w-full" className="w-28 flex capitalize">
+                    Catagory
+                  </th>
+                  <th scope="w-full" className="w-64 flex capitalize">
+                    address
+                  </th>
+                  <th scope="w-full" className="w-28 flex capitalize">
+                    pincode
+                  </th>
+                  <th scope="w-full" className="w-28 flex capitalize">
+                    filtered
+                  </th>
+                  <th scope="w-full" className="w-36 flex capitalize">
+                    State
+                  </th>
+                  <th scope="w-full" className="w-36 flex capitalize">
+                    officeNo1
+                  </th>
+                  <th scope="w-full" className="w-36 flex capitalize">
+                    officeNo1
+                  </th>
+                  <th scope="w-full" className="w-36 flex capitalize">
+                    MobileNo
+                  </th>
+                  <th scope="w-full" className="w-36 flex capitalize">
+                    email
+                  </th>
+                  <th scope="w-full" className="w-36 flex capitalize">
+                    action
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="">
+                {filtered &&
+                  filtered.map((doc, index) => (
+                    <tr
+                      key={index}
+                      className="flex items-center gap-3 py-2 px-3 bg-gray-200 border-b border-gray-400"
+                    >
+                      <td scope="w-full" className="p-1 py-3 ">
+                        {index + 1}
+                      </td>
+                      <td
+                        scope="w-full"
+                        className="w-28 text-ellipsis overflow-hidden truncate"
+                      >
+                        {doc.Customer}
+                      </td>
+                      <td
+                        scope="w-full"
+                        className="w-28 text-ellipsis overflow-hidden truncate"
+                      >
+                        {doc.Catagory}
+                      </td>
+                      <td
+                        scope="w-full"
+                        className="w-64 text-ellipsis overflow-hidden truncate"
+                      >
+                        {doc.Address1}
+                        {doc.Address2}
+                        {doc.Address3}
+                      </td>
+                      <td
+                        scope="w-full"
+                        className="w-28 text-ellipsis overflow-hidden truncate"
+                      >
+                        {doc.Pincode}
+                      </td>
+                      <td
+                        scope="w-full"
+                        className="w-28 text-ellipsis overflow-hidden truncate"
+                      >
+                        {doc.City}
+                      </td>
+                      <td
+                        scope="w-full"
+                        className="w-36 text-ellipsis overflow-hidden truncate"
+                      >
+                        {doc.State}
+                      </td>
+                      <td
+                        scope="w-full"
+                        className="w-36 text-ellipsis overflow-hidden truncate"
+                      >
+                        {doc.OfficeNo1}
+                      </td>
+                      <td
+                        scope="w-full"
+                        className="w-36 text-ellipsis overflow-hidden truncate"
+                      >
+                        {doc.OfficeNo2}
+                      </td>
+                      <td
+                        scope="w-full"
+                        className="w-36 text-ellipsis overflow-hidden truncate"
+                      >
+                        {doc.MobileNo}
+                      </td>
+                      <td
+                        scope="w-full"
+                        className="w-36 text-ellipsis overflow-hidden truncate"
+                      >
+                        {doc.Email}
+                      </td>
+                      <td scope="w-full" className=" p-1 th4">
+                        <div className="flex gap-3">
+                          <button
+                            class="bg-blue-500 text-white p-2 rounded-full text-2xl"
+                            onClick={() => {
+                              setShowModel(true);
+                              setTypeBtn("update");
+                              setId(doc.id);
+                            }}
+                          >
+                            <BiEdit />
+                          </button>
+                          <button
+                            class="bg-red-500 text-white p-2 rounded-full text-2xl"
+                       
+                          >
+                            <BiTrash />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-      <div className="tableFixHead p-2">
-        <table className="table">
-          <thead className="custom-thead">
-            <tr className="">
-              <th scope="col" className="p-1 col">
-                #
-              </th>
-              <th scope="col" className="p-1 col th4 text-capitalize">
-                customer
-              </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
-                Catagory
-              </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
-                address1
-              </th>
-              <th scope="col" className="p-1 th4  text-capitalize">
-                address2
-              </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
-                address3
-              </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
-                pincode
-              </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
-                city
-              </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
-                State
-              </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
-                officeNo1
-              </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
-                officeNo1
-              </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
-                MobileNo
-              </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
-                email
-              </th>
-              <th scope="col" className="p-1 th4 text-capitalize">
-                action
-              </th>
-            </tr>
-          </thead>
-          <tbody className="table-group-divider custom-tbody">
-            {filterData.map((doc, index) => (
-              <tr key={index} className="d-flex">
-                <td scope="col" className="p-1 py-3 ">
-                  {index + 1}
-                </td>
-                <td scope="col" className="p-1 py-3 th4">
-                  {doc.Customer}
-                </td>
-                <td scope="col" className="p-1 py-3 th4">
-                  {doc.Catagory}
-                </td>
-                <td scope="col" className="p-1 py-3 th4">
-                  {doc.Address1}
-                </td>
-                <td scope="col" className="p-1 py-3 th4">
-                  {doc.Address2}
-                </td>
-                <td scope="col" className="p-1 py-3 th4">
-                  {doc.Address3}
-                </td>
-                <td scope="col" className="p-1 py-3 th4">
-                  {doc.Pincode}
-                </td>
-                <td scope="col" className="p-1 py-3 th4">
-                  {doc.City}
-                </td>
-                <td scope="col" className="p-1 py-3 th4">
-                  {doc.State}
-                </td>
-                <td scope="col" className="p-1 py-3 th4">
-                  {doc.OfficeNo1}
-                </td>
-                <td scope="col" className="p-1 py-3 th4">
-                  {doc.OfficeNo2}
-                </td>
-                <td scope="col" className="p-1 py-3 th4">
-                  {doc.MobileNo}
-                </td>
-                <td scope="col" className="p-1 py-3 th4">
-                  {doc.Email}
-                </td>
-                <td scope="col" className=" p-1 th4">
-                  <div className="d-flex">
-                    <button
-                      className="btn btn-primary text-white fw-bold  rounded-5 m-1 update"
-                      onClick={() => {
-                        setShowModel(true);
-                        setTypeBtn("update");
-                        setId(doc.id);
-                      }}
-                    >
-                      U
-                    </button>
-                    <button
-                      className="btn btn-danger text-white fw-bold  rounded-5 m-1 delete"
-                      value={doc.id}
-                      onClick={deleteData}
-                    >
-                      D
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </>
   );

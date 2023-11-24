@@ -7,6 +7,8 @@ import Select from "react-select";
 const cityRef = collection(DB, "City");
 const Search = ({ value, onChange, options }) => {
   const [data, setData] = useState([]);  
+
+  
   const getData = async () => {
     const data = await getDocs(cityRef);
     const da = data.docs.map((d) => ({ ...d.data() }));

@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import ReactToPrint from "react-to-print";
-import "./master.css";
+import "./print.css";
 export default function Home() {
   const componentRef = useRef();
 

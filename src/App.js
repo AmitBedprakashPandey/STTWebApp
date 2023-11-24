@@ -1,34 +1,36 @@
 import "./App.css";
-import {Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Quality from "./Master/Quality";
-import Header from "./header";
+import Navbar from "./components/Navbar";
 import City from "./Master/City";
 import Catagory from "./Master/catagory";
 import Supplier from "./Master/Supplier";
 import Process from "./Master/Process";
+import PrintPage from "./printPage/CustomerWisePrint";
 import Home from "./Master/Home";
 import Transport from "./Master/Transport";
 import Customer from "./Master/Customer";
-import CustomerWiseReport from './Report/CustomerWiseReport';
-import { useEffect } from "react";
-import 'react-toastify/dist/ReactToastify.css';
+import CustomerWiseReport from "./Report/CustomerWiseReport";
+import "react-toastify/dist/ReactToastify.css";
+import CustomerWise from "./Entry/CustomerWise";
 
 function App() {
-return (<>
-    <Header/>
-    <div style={{margin:70}} />
-        <Routes>                
-        <Route path="/" element={<Home/>} />
-          <Route path="/quality" element={<Quality/>} />
-          <Route path="/city" element={<City/>} />
-          <Route path="/transport" element={<Transport/>} />
-          
-          {/* <Route path="/supplier" element={<Supplier/>} />
-          <Route path="/process" element={<Process/>} />
-         <Route path="/catagory" element={<Catagory/>} />
-          <Route path="/customer" element={<Customer/>} />
-          <Route path="/customerwisereport" element={<CustomerWiseReport/>} /> */}
-        </Routes>
+  return (
+    <>
+      <Navbar />
+      <Routes>
+        <Route exct path="/" element={<Home />} />
+        <Route exct path="/quality" element={<Quality />} />
+        <Route exct path="/city" element={<City />} />
+        <Route exct path="/transport" element={<Transport />} />
+        <Route exct path="/process" element={<Process />} />
+        <Route exct path="/customer" element={<Customer />} />
+        <Route path="/supplier" element={<Supplier />} />
+        <Route path="/catagory" element={<Catagory />} />
+        <Route path="/customerwise" element={<CustomerWise />} />
+        <Route path="/customerwisereport" element={<CustomerWiseReport />} />
+        <Route path="/printpage" element={<PrintPage />} />
+      </Routes>
     </>
   );
 }

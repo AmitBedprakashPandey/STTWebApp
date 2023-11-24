@@ -1,167 +1,87 @@
 import React, { useEffect, useState } from "react";
 import "./master.css";
-import {addDoc, collection,getDoc ,doc ,updateDoc,getDocs, deleteDoc} from "firebase/firestore";
-import { DB } from "../config/db.firebase";
 import { ToastContainer, toast } from "react-toastify";
-const QualityRef = collection(DB, "quality");
-const ShowModel = ({ id, close, change }) => {
-  const [oldName, setOldName] = useState();
-  const [newName, setNewName] = useState();
+import { Link } from "react-router-dom";
+import { BiEdit, BiPencil, BiSave, BiTrash, BiX } from "react-icons/bi";
+import { useDispatch, useSelector } from "react-redux";
 
-  const getolddata = async () => {
-    const datas = await getDoc(doc(QualityRef, id));
-    setOldName(datas.data().QualityNm);
-  };
+const ShowModel = ({ close }) => {
+  const [oldName, setOldName] = useState();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    getolddata();
     document.body.style.overflowY = "hidden";
     return () => (document.body.style.overflowY = "scroll");
   }, []);
 
   const update = async () => {
-    if (!newName) {
-      toast.warning("Please enter name");
-    } else {
-      const datas = doc(QualityRef, id);
-      await updateDoc(datas, { QualityNm: newName }).then(
-        (doc) => toast.success("UPDATE")
-      );
-      setNewName("");
-      getolddata();
+    try {
+    } catch (error) {
+      console.log(error);
     }
   };
 
   return (
     <>
-      <div class="modelBg">
-        <div class="card Main-Model">
-          <button className="btn-close closebtn" onClick={close} />
-          <div class="card-header d-flex  justify-content-center text-uppercase ">
+      <div
+        class="absolute top-0 bottom-0 left-0 right-0 z-50 flex justify-center"
+        style={{ backgroundColor: "rgba(0, 0, 0, 0.26)" }}
+      >
+        <div class="w-80 bg-white rounded-2xl absolute mt-56">
+          <div class="text-2xl uppercase flex justify-center py-3">
             <h5>Update</h5>
           </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col">
-                <div class="input-wrapper mt-2">
+          <div class="card-body p-4">
+            <div class="model-boxs">
+              <div class="">
+                <div class="mt-2  w-full">
                   <input
                     type="text"
                     id="input"
-                    class="form-inp"
-                    autocomplete="off"
+                    class="rounded-lg px-3 py-2 border border-black text-lg w-full placeholder:capitalize"
                     value={oldName}
-                    disabled
+                    placeholder="title"
+                    onChange={(e) => setOldName(e.target.value)}
                   />
-                  <label for="input" class="form-labNm text-capitalize">
-                    old Name
-                  </label>
                 </div>
               </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <div class="input-wrapper mt-3">
-                  <input
-                    type="text"
-                    id="input"
-                    class="form-inp"
-                    required
-                    autocomplete="off"
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                  />
-                  <label for="input" class="form-lab text-capitalize ">
-                    new Name
-                  </label>
-                </div>
+              <div class="flex justify-end items-center gap-4 mt-3">
+                <button
+                  class="bg-blue-500 text-white font-bold rounded-xl px-5 py-3 uppercase"
+                  onClick={update}
+                >
+                  UPDATE
+                </button>
+                <button
+                  class="bg-red-500 text-white font-bold rounded-xl px-5 py-3 uppercase"
+                  onClick={() => {
+                    setOldName("");
+                  }}
+                >
+                  cancel
+                </button>
               </div>
             </div>
-          </div>
-          <hr />
-          <div class="d-flex flex-row-reverse p-2 ">
-            <button
-              class="btn btn-primary text-white fw-bold   rounded-2 px-5 py-2 m-2 text-uppercase"
-              onClick={() => {
-                update();
-                change();
-              }}
-            >
-              UPDATE
-            </button>
           </div>
         </div>
       </div>
     </>
   );
 };
-const currentDate = () => {
-  const date = new Date();
-  let day = date.getDate();
-  let month = date.getMonth() + 1;
-  let year = date.getFullYear();
-  currentDate = `${day}-${month}-${year}`;
-  return currentDate;
-};
-export default function Quality() {
-  const [qualityList, setQualityList] = useState([]);
+export default function Quality({ close }) {
+  const [CityList, setCityList] = useState([]);
   const [filterData, setFilterData] = useState([]);
-  const [qualityName, setQualityName] = useState("");
+  const [name, setName] = useState("");
   const [showModel, setShowModel] = useState(false);
-  const [id, setId] = useState();
+  const dispatch = useDispatch();
+  const { quality, loading } = useSelector((state) => state.Quality);
+  console.log(quality);
+  useEffect(() => {}, []);
 
-  const getQuality = async () => {
-    try {
-      const querySnapshot = await getDocs(QualityRef);
-      const datas = querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
-      setQualityList(datas);
-      setFilterData(datas);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const searchQuality = (e) => {
-    console.log(e.target.value);
-    const data = qualityList.filter((val) =>
-      val.QualityNm.toLowerCase().includes(e.target.value)
-    );
-    setFilterData(data);
-  };
-
-  useEffect(() => {
-    getQuality();
-    document.body.style.overflowY = "hidden";
-  }, []);
-
-  const QualitySave = async () => {
-    if (!qualityName) {
-      toast.warning("Please enter name");
-    } else {
-      await addDoc(QualityRef, {
-        QualityNm: qualityName,
-        date: currentDate,
-      }).then((doc) => toast.success("SAVE"));
-      setQualityName("");
-      getQuality();
-    }
-  };
-
-  const QualityDelete =(id) => {
-  if(!id){
-    return toast.warning()
-  }
-    deleteDoc(doc(QualityRef, id)).then(() =>
-        toast.success("DELETE")
-      );
-      getQuality();
-      window.location.reload(false)
-  
-  };
+  const save = async () => {};
   return (
-  <>
-    <ToastContainer
+    <div className="py-1 flex md:justify-center w-full">
+      <ToastContainer
         position="bottom-right"
         autoClose={5000}
         hideProgressBar={false}
@@ -171,91 +91,100 @@ export default function Quality() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="light"      
+        theme="light"
       />
-
-  
-  
-      {showModel && (
-        <ShowModel
-          id={id}
-          close={() => setShowModel(false)}
-          change={getQuality}
-        />
-      )}
-
-      <div class="card border-0 p-0 m-0">
-        <div class="card-header bg-danger text-white border-0 m-0 p-2 d-flex justify-content-center text-uppercase fs-3 fw-bold rounded-0 ">
-          Qulaity
+      {showModel && <ShowModel close={() => setShowModel(false)} />}
+      <div class="w-full md:w-[600px]">
+        <div class="flex gap-2 px-5 py-3">
+          <Link to={"/"} className="capitalize hover:font-medium">
+            home
+          </Link>
+          /
+          <Link to={"/quality"} className="capitalize hover:font-medium">
+            quality
+          </Link>
         </div>
-        <div class="justify-content-between col-lg-8 mx-auto d-md-flex d-sm-inline-flex  ">
-          <div class="d-flex py-2 mt-2  col-lg-4">
-            <div class="input-wrapper">
-              <input type="text" id="input" class="form-inp" required value={qualityName} onChange={(e)=>qualityName(e.target.value)}/>
-              <label for="input" class="form-lab">
-                Full name
+        <div class="flex flex-col justify-between">
+          <div class="flex gap-2 items-center mx-3">
+            <div class="flex flex-col relative w w-full">
+              <label for="input" class="capitalize ">
+                title
               </label>
+              <input
+                type="text"
+                id="input"
+                class="rounded-lg px-3 py-2 border border-black text-lg placeholder:capitalize"
+                placeholder="title"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
             </div>
-            <button class="btn btn-success py-2 px-3 text-white fw-bold text-uppercase rounded-0" onClick={QualitySave}>
+            <button
+              onClick={save}
+              class="bg-green-500 flex items-center gap-2 text-white px-3 py-2 text-lg mt-6 rounded-xl uppercase font-medium hover:font-bold"
+            >
+              <BiSave className="text-2xl" />
               Add
             </button>
           </div>
-          <div class="d-flex mt-3 py-0">
-            <div class="input-wrapper w-100">
-              <input type="text" id="input" class="form-inp p-3" required onChange={searchQuality}/>
-              <label for="input" class="form-lab">
-                Search
-              </label>
+          <div class="flex items-center mt-3 mx-3">
+            <div class="w-full">
+              <input
+                type="text"
+                id="input"
+                class="rounded-lg px-3 py-2 border border-black text-lg w-full"
+                placeholder="search"
+                required
+              />
             </div>
           </div>
         </div>
-
-        <div class="tableFixHead">
-          <table class="table">
-            <thead>
-              <tr class="">
-                <th scope="col" class="text-capitalize">
+        <div class="mx-3 mt-3 bg-white shadow-md ">
+          <table class="w-full">
+            <thead className="border-b border-gray-500">
+              <tr class="flex gap-3 items-center py-2 px-3 bg-slate-300">
+                <th scope="col" class="capitalize flex">
                   #
                 </th>
-                <th scope="col" class="text-capitalize">
+                <th scope="col" class="capitalize w-56 flex">
                   particular
                 </th>
-                <th scope="col" class="text-capitalize">
-                  date
-                </th>
-                <th scope="col" class="text-capitalize">
+                <th scope="col" class="capitalize flex">
                   action
                 </th>
               </tr>
             </thead>
-            <tbody class="table-group-divider">
-              {filterData.map((item,index)=>(
-              <tr class="col-12">
-                <th scope="col" class="col-1">
-                  {index+1}
-                </th>
-                <td scope="col" class="col">
-                  {item.QualityNm}
-                </td>
-                <td scope="col" class="col">
-                  {item.QualityDt}
-                </td>
-                <td scope="col" class="col">
-                  <div class="d-flex">
-                    <button onClick={()=>{setShowModel(true);setId(item.id)}} class="btn btn-primary rounded-5  text-white">
-                      <i class="bi bi-pencil-square"></i>
-                    </button>
-                    <button class="btn btn-danger rounded-5 mx-1 text-white" onClick={()=>QualityDelete(item.id)}>
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              ))}
+            <tbody class="">
+              {quality &&
+                quality.map((item, index) => (
+                  <tr class="flex gap-3 py-3 items-center px-3 border-b border-black">
+                    <td scope="col" class="font-bold">
+                      {index + 1}
+                    </td>
+                    <td scope="col" class="w-56 capitalize font-bold">
+                      {item.QualityNm}
+                    </td>
+                    <td scope="col" class="">
+                      <div class="flex gap-3">
+                        <button
+                          onClick={() => {
+                            setShowModel(true);
+                          }}
+                          class="bg-blue-500 text-white p-2 rounded-full text-2xl"
+                        >
+                          <BiEdit />
+                        </button>
+                        <button class="bg-red-500 text-white p-2 rounded-full text-2xl">
+                          <BiTrash />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
       </div>
-    </>
+    </div>
   );
 }
